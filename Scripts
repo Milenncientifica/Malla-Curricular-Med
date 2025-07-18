@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Malla Curricular Medicina</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fdf1f1;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #c94b4b;
+    }
+    .grid {
+      display: flex;
+      overflow-x: auto;
+      padding: 10px 0;
+      gap: 20px;
+    }
+    .ciclo {
+      background-color: #fbe3e3;
+      border: 2px solid #f6c8c7;
+      border-radius: 12px;
+      padding: 15px;
+      min-width: 220px;
+    }
+    .ciclo h2 {
+      color: #c94b4b;
+      margin-top: 0;
+    }
+    .curso {
+      background-color: #f9d6d5;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 5px 0;
+      width: 100%;
+      cursor: pointer;
+      color: #000;
+    }
+    .curso.aprobado {
+      background-color: #eebbbb;
+      text-decoration: line-through;
+    }
+    .curso.bloqueado {
+      background-color: #ddd;
+      color: #888;
+      cursor: not-allowed;
+    }
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 180px;
+      background-color: #eebbbb;
+      color: #000;
+      text-align: center;
+      padding: 5px;
+      border-radius: 6px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+    select {
+      margin-top: 5px;
+      width: 100%;
+      padding: 5px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Malla Curricular de Medicina Humana</h1>
+  <div class="grid" id="contenedor-ciclos"></div>
+
+  <script>
+    const cursosPorCiclo = { 
+      "1": [
+  { "codigo": "815080", "nombre": "Química", "prerequisitos": [] },
+  { "codigo": "815081", "nombre": "Matemática", "prerequisitos": [] },
+  { "codigo": "815082", "nombre": "Lengua y Oratoria", "prerequisitos": [] },
+  { "codigo": "815079", "nombre": "Introducción a la Medicina", "prerequisitos": [] },
+  { "codigo": "813857", "nombre": "Desempeño Universitario", "prerequisitos": [] },
+  { "codigo": "815078", "nombre": "Biología Celular y Molecular", "prerequisitos": [] }
+]
+      "2": [
+  { "codigo": "003923", "nombre": "Redacción General", "prerequisitos": ["Lengua y Oratoria"] },
+  { "codigo": "810347", "nombre": "Realidad Nacional", "prerequisitos": ["Lengua y Oratoria", "Desempeño Universitario"] },
+  { "codigo": "815192", "nombre": "Morfofisiología I", "prerequisitos": ["Biología Celular y Molecular"] },
+  { "codigo": "813510", "nombre": "Introducción a la Investigación", "prerequisitos": ["Introducción a la Medicina"] },
+  { "codigo": "001013", "nombre": "Bioquímica", "prerequisitos": ["Química"] },
+  { "codigo": "813995", "nombre": "Anatomía General", "prerequisitos": ["Biología Celular y Molecular"] }
+]
+      "3": [
+  { "codigo": "814087", "nombre": "Morfofisiología II", "prerequisitos": ["Anatomía General", "Morfofisiología I"] },
+  { "codigo": "815193", "nombre": "Inmunología", "prerequisitos": ["Morfofisiología I"] },
+  { "codigo": "814089", "nombre": "Genética Médica", "prerequisitos": ["Biología Celular y Molecular"] },
+  { "codigo": "810325", "nombre": "Filosofía", "prerequisitos": [] },
+  { "codigo": "001007", "nombre": "Estadística General", "prerequisitos": ["Matemática"] },
+  { "codigo": "003922", "nombre": "Educación Ambiental", "prerequisitos": [] }
+]
+        "4": [
+  { "codigo": "814090", "nombre": "Morfofisiología III", "prerequisitos": ["Anatomía General", "Morfofisiología I"] },
+  { "codigo": "815194", "nombre": "Infectología Básica", "prerequisitos": ["Bioquímica", "Morfofisiología I"] },
+  { "codigo": "814091", "nombre": "Fisiopatología I", "prerequisitos": ["Morfofisiología II"] },
+  { "codigo": "815195", "nombre": "Desarrollo y Crecimiento", "prerequisitos": ["Biología Celular y Molecular"] },
+  { "codigo": "814097", "nombre": "Bioética", "prerequisitos": ["Introducción a la Medicina", "Redacción General"] }
+]
+          "5": [
+  { "codigo": "815199", "nombre": "Salud Mental", "prerequisitos": ["Filosofía"] },
+  { "codigo": "815196", "nombre": "Morfofisiología IV", "prerequisitos": ["Morfofisiología III"] },
+  { "codigo": "815200", "nombre": "Fundamentos de Medicina Interna", "prerequisitos": ["Filosofía", "Realidad Nacional"] },
+  { "codigo": "815197", "nombre": "Fisiopatología II", "prerequisitos": ["Morfofisiología II"] },
+  { "codigo": "815198", "nombre": "Bioestadística", "prerequisitos": ["Estadística General"] }
+]
+          "6": [
+  { "codigo": "815360", "nombre": "Semiología basada en la simulación", "prerequisitos": ["Fisiopatología I", "Fisiopatología II", "Inmunología", "Morfofisiología II", "Morfofisiología III", "Morfofisiología IV"] },
+  { "codigo": "815201", "nombre": "Semiología", "prerequisitos": ["Fisiopatología I", "Fisiopatología II", "Inmunología", "Morfofisiología II", "Morfofisiología III", "Morfofisiología IV"] },
+  { "codigo": "815203", "nombre": "Farmacología", "prerequisitos": ["Infectología Básica"] },
+  { "codigo": "815202", "nombre": "Apoyo al Diagnóstico", "prerequisitos": ["Morfofisiología IV"] },
+  { "codigo": "814101", "nombre": "Anatomía Patológica", "prerequisitos": ["Fisiopatología II"] }
+]
+          "7": [
+  { "codigo": "815206", "nombre": "Seguridad del Paciente y Calidad", "prerequisitos": ["Bioética"] },
+  { "codigo": "815207", "nombre": "Nutrición y Prácticas Saludables", "prerequisitos": ["Farmacología"] },
+  { "codigo": "814106", "nombre": "Metodología de la Investigación", "prerequisitos": ["Bioestadística"] },
+  { "codigo": "815204", "nombre": "Medicina Interna I", "prerequisitos": ["Anatomía Patológica", "Semiología", "Semiología basada en la simulación"] },
+  { "codigo": "815205", "nombre": "Epidemiología", "prerequisitos": ["Bioestadística"] }
+]
+          "8": [
+  { "codigo": "815209", "nombre": "Salud Pública", "prerequisitos": ["Epidemiología"] },
+  { "codigo": "815208", "nombre": "Medicina Interna II", "prerequisitos": ["Medicina Interna I"] },
+  { "codigo": "815619", "nombre": "Medicina Basada en la Evidencia", "prerequisitos": ["Epidemiología", "Metodología de la Investigación"] },
+  { "codigo": "815210", "nombre": "Atención Primaria en Salud", "prerequisitos": ["Epidemiología"] }
+]
+            "9": [
+  { "codigo": "815212", "nombre": "Tesis I", "prerequisitos": ["Medicina Basada en la Evidencia"] },
+  { "codigo": "001053", "nombre": "Terapéutica", "prerequisitos": ["Medicina Interna II"] },
+  { "codigo": "815361", "nombre": "Simulación Clínica Integrada", "prerequisitos": ["Medicina Interna II"] },
+  { "codigo": "001061", "nombre": "Medicina Legal", "prerequisitos": ["Bioética", "Semiología", "Semiología basada en la simulación"] },
+  { "codigo": "815211", "nombre": "Medicina Interna III", "prerequisitos": ["Medicina Interna II"] }
+]
+              "10": [
+  { "codigo": "815362", "nombre": "Simulación Quirúrgica", "prerequisitos": ["Medicina Interna III", "Simulación Clínica Integrada"] },
+  { "codigo": "814113", "nombre": "Ecografía", "prerequisitos": ["Apoyo al Diagnóstico", "Semiología"] },
+  { "codigo": "815214", "nombre": "Cuidados Paliativos y Rehabilitación Física", "prerequisitos": ["Bioética", "Terapéutica"] },
+  { "codigo": "815213", "nombre": "Cirugía", "prerequisitos": ["Medicina Interna III", "Simulación Clínica Integrada"] },
+  { "codigo": "815215", "nombre": "Análisis de Casos I", "prerequisitos": ["Medicina Interna III", "Simulación Clínica Integrada", "Terapéutica"] }
+]
+              "11": [
+  { "codigo": "815218", "nombre": "Tesis II", "prerequisitos": ["Tesis I"] },
+  { "codigo": "815363", "nombre": "Simulación Pediátrica", "prerequisitos": ["Medicina Interna III", "Simulación Clínica Integrada"] },
+  { "codigo": "815364", "nombre": "Simulación Gineco-Obstetricia", "prerequisitos": ["Cirugía", "Simulación Quirúrgica"] },
+  { "codigo": "815216", "nombre": "Pediatría", "prerequisitos": ["Medicina Interna III", "Simulación Clínica Integrada"] },
+  { "codigo": "815217", "nombre": "Ginecología y Obstetricia", "prerequisitos": ["Cirugía", "Simulación Quirúrgica"] }
+]
+              "12": [
+  { "codigo": "815219", "nombre": "Pre-Internado", "prerequisitos": ["Todos los cursos obligatorios hasta el XI ciclo"] },
+  { "codigo": "812812", "nombre": "Informática Biomédica", "prerequisitos": ["Atención Primaria en Salud"] },
+  { "codigo": "815220", "nombre": "Gerencia en Salud", "prerequisitos": ["Atención Primaria en Salud"] },
+  { "codigo": "815221", "nombre": "Análisis de Casos II", "prerequisitos": ["Análisis de Casos I"] }
+]
+                "13": [
+  { "codigo": "815222", "nombre": "Trabajo de Investigación", "prerequisitos": ["Todos los cursos obligatorios hasta el XII ciclo", "8 créditos electivos"] },
+  { "codigo": "001078", "nombre": "Internado en Pediatría", "prerequisitos": ["Todos los cursos obligatorios hasta el XII ciclo", "8 créditos electivos"] },
+  { "codigo": "001077", "nombre": "Internado en Medicina", "prerequisitos": ["Todos los cursos obligatorios hasta el XII ciclo", "8 créditos electivos"] },
+  { "codigo": "001075", "nombre": "Internado en Cirugía", "prerequisitos": ["Todos los cursos obligatorios hasta el XII ciclo", "8 créditos electivos"] },
+  { "codigo": "001076", "nombre": "Internado en Ginecología y Obstetricia", "prerequisitos": ["Todos los cursos obligatorios hasta el XII ciclo", "8 créditos electivos"] }
+] 
+                "14": [
+  { "codigo": "815222", "nombre": "Trabajo de Investigación", "prerequisitos": ["Todos los cursos obligatorios hasta el XII ciclo", "8 créditos electivos"] },
+  { "codigo": "001078", "nombre": "Internado en Pediatría", "prerequisitos": ["Todos los cursos obligatorios hasta el XII ciclo", "8 créditos electivos"] },
+  { "codigo": "001077", "nombre": "Internado en Medicina", "prerequisitos": ["Todos los cursos obligatorios hasta el XII ciclo", "8 créditos electivos"] },
+  { "codigo": "001075", "nombre": "Internado en Cirugía", "prerequisitos": ["Todos los cursos obligatorios hasta el XII ciclo", "8 créditos electivos"] },
+  { "codigo": "001076", "nombre": "Internado en Ginecología y Obstetricia", "prerequisitos": ["Todos los cursos obligatorios hasta el XII ciclo", "8 créditos electivos"] }
+                  
+    };
+
+    const electivosDisponibles = [
+  { codigo: "E001", nombre: "Uso Correcto de Antibióticos y Medicina de Infecciones", prerequisitos: ["Farmacología", "Infectología Básica"] },
+  { codigo: "E002", nombre: "Simulación en Salud", prerequisitos: ["Procesos Cognitivos y Teorías del Aprendizaje"] },
+  { codigo: "E003", nombre: "Radioanatomía", prerequisitos: ["Morfofisiología III"] },
+  { codigo: "E004", nombre: "Procesos Cognitivos y Teorías del Aprendizaje", prerequisitos: [] },
+  { codigo: "E005", nombre: "Neurociencia en Salud", prerequisitos: ["Morfofisiología IV", "Redacción General"] },
+  { codigo: "E006", nombre: "Primeros Auxilios", prerequisitos: ["Anatomía General"] },
+  { codigo: "E007", nombre: "Neuropsicofarmacología y Medicina de Atención Comunitaria", prerequisitos: ["Uso Correcto de Antibióticos y Medicina de Infecciones"] },
+  { codigo: "E008", nombre: "Medicina Ocupacional", prerequisitos: ["Gestión de Riesgos en Salud"] },
+  { codigo: "E009", nombre: "Medicina Interna e Interprofesionalidad", prerequisitos: ["Medicina Interna I"] },
+  { codigo: "E010", nombre: "Medicina Tradicional, Alternativa y Complementaria", prerequisitos: ["Fundamentos de Medicina Intercultural"] },
+  { codigo: "E011", nombre: "Liderazgo en Salud", prerequisitos: ["Desempeño Universitario", "Introducción a la Medicina"] },
+  { codigo: "E012", nombre: "Introducción a la Investigación Cualitativa", prerequisitos: ["Introducción al Análisis de Datos I"] },
+  { codigo: "E013", nombre: "Introducción al Análisis de Datos I", prerequisitos: ["Estadística General", "Introducción a la Investigación"] },
+  { codigo: "E014", nombre: "Introducción al Análisis de Datos II", prerequisitos: ["Introducción al Análisis de Datos I"] },
+  { codigo: "E015", nombre: "Introducción a Revisiones Sistemáticas y Meta-análisis", prerequisitos: ["Búsqueda sistemática de información"] },
+  { codigo: "E016", nombre: "Historia de la Medicina", prerequisitos: [] },
+  { codigo: "E017", nombre: "Gestión de Riesgos en Salud", prerequisitos: ["Gestión de Proyectos en Salud"] },
+  { codigo: "E018", nombre: "Gestión de Proyectos en Salud", prerequisitos: ["Liderazgo en Salud"] },
+  { codigo: "E019", nombre: "Farmacogenómica y Epigenética", prerequisitos: ["Genética Médica"] },
+  { codigo: "E020", nombre: "Equinoterapia", prerequisitos: ["Introducción a la Medicina"] },
+  { codigo: "E021", nombre: "Docencia Basada en Simulación", prerequisitos: ["Procesos Cognitivos y Teorías del Aprendizaje"] },
+  { codigo: "E022", nombre: "Docencia Basada en Análisis de Casos", prerequisitos: ["Procesos Cognitivos y Teorías del Aprendizaje"] },
+  { codigo: "E023", nombre: "Desarrollo Artístico", prerequisitos: ["Desempeño Universitario"] },
+  { codigo: "E024", nombre: "Búsqueda Sistemática de Información", prerequisitos: ["Introducción al Análisis de Datos II", "Introducción a la Investigación Cualitativa"] },
+  { codigo: "E025", nombre: "Auditoría Médica", prerequisitos: ["Gestión de Riesgos en Salud"] },
+  { codigo: "E026", nombre: "Aprendizaje Interprofesional", prerequisitos: ["Medicina Interna I"] }
+    ];
+
+    const estadoCursos = JSON.parse(localStorage.getItem('estadoCursos')) || {};
+
+    function guardarEstado() {
+      localStorage.setItem('estadoCursos', JSON.stringify(estadoCursos));
+    }
+
+    function requisitosCumplidos(curso) {
+      return curso.prerrequisitos.every(pr => estadoCursos[pr]);
+    }
+
+    function crearCursoBtn(curso) {
+      const btn = document.createElement('button');
+      btn.className = 'curso';
+      btn.textContent = `${curso.codigo} - ${curso.nombre}`;
+
+      if (!requisitosCumplidos(curso)) {
+        btn.classList.add('bloqueado');
+        const tooltip = document.createElement('span');
+        tooltip.className = 'tooltiptext';
+        tooltip.textContent = 'Falta: ' + curso.prerrequisitos.filter(pr => !estadoCursos[pr]).join(', ');
+        const wrapper = document.createElement('div');
+        wrapper.className = 'tooltip';
+        wrapper.appendChild(btn);
+        wrapper.appendChild(tooltip);
+        return wrapper;
+      }
+
+      if (estadoCursos[curso.codigo]) {
+        btn.classList.add('aprobado');
+      }
+
+      btn.addEventListener('click', () => {
+        if (btn.classList.contains('bloqueado')) return;
+        estadoCursos[curso.codigo] = !estadoCursos[curso.codigo];
+        guardarEstado();
+        location.reload();
+      });
+
+      return btn;
+    }
+
+    function crearElectivoSelect(ciclo, index) {
+      const select = document.createElement('select');
+      const slot = `ELE${(ciclo - 1) * 3 + index}`;
+
+      const opcionNinguno = document.createElement('option');
+      opcionNinguno.value = '';
+      opcionNinguno.textContent = 'Ninguno';
+      select.appendChild(opcionNinguno);
+
+      electivosDisponibles.forEach(e => {
+        if (requisitosCumplidos(e)) {
+          const opt = document.createElement('option');
+          opt.value = e.codigo;
+          opt.textContent = `${e.codigo} - ${e.nombre}`;
+          select.appendChild(opt);
+        }
+      });
+
+      select.value = estadoCursos[slot] || '';
+
+      select.addEventListener('change', () => {
+        estadoCursos[slot] = select.value;
+        guardarEstado();
+        location.reload();
+      });
+
+      if (estadoCursos[slot]) {
+        const curso = electivosDisponibles.find(e => e.codigo === estadoCursos[slot]);
+        if (curso) {
+          const btn = crearCursoBtn(curso);
+          return btn;
+        }
+      }
+
+      return select;
+    }
+
+    function mostrarCiclos() {
+      const contenedor = document.getElementById('contenedor-ciclos');
+      for (let ciclo = 1; ciclo <= 14; ciclo++) {
+        const divCiclo = document.createElement('div');
+        divCiclo.className = 'ciclo';
+        const titulo = document.createElement('h2');
+        titulo.textContent = `Ciclo ${ciclo}`;
+        divCiclo.appendChild(titulo);
+
+        const cursos = cursosPorCiclo[ciclo] || [];
+        cursos.forEach((curso, i) => {
+          if (curso.electivo) {
+            divCiclo.appendChild(crearElectivoSelect(ciclo, i + 1));
+          } else {
+            divCiclo.appendChild(crearCursoBtn(curso));
+          }
+        });
+
+        contenedor.appendChild(divCiclo);
+      }
+    }
+
+    mostrarCiclos();
+  </script>
+</body>
+</html>
